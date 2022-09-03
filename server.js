@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 
+// use middleware to parse req.body as JSON (before it gets to the routes)
+app.use(express.json())
+
 // Hard coded list of notes
 let notes = [
   {
