@@ -33,6 +33,19 @@ app.get('/api/notes', (req, res) => {
   res.json(notes)
 })
 
+// Get note by id
+app.get('/api/notes/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const note = notes.find((note) => note.id == id)
+
+  if (note) {
+    res.json(note)
+  } else {
+    res.status(404).end()
+  }
+  
+})
+
 const PORT = 8000
 app.listen(process.env.PORT || PORT, () => {
   console.log(`Server running on ${PORT}`)
