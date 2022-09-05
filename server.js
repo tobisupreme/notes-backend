@@ -1,8 +1,19 @@
 const express = require('express')
 const app = express()
 
+// implement request logger middleware
+const requestLogger = (req, res, next) => {
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('-----')
+  next()
+}
+
 // use middleware to parse req.body as JSON (before it gets to the routes)
 app.use(express.json())
+
+app.use(requestLogger)
 
 // Hard coded list of notes
 let notes = [
