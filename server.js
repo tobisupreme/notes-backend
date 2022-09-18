@@ -1,5 +1,9 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
+
+// allow requests from all origins
+app.use(cors())
 
 // implement request logger middleware
 const requestLogger = (req, res, next) => {
