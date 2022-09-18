@@ -92,6 +92,27 @@ app.post('/api/notes', (req, res) => {
   res.json(note)
 })
 
+// Update note
+app.put('/api/notes/:id', (req, res) => {
+  const id = Number(req.params.id)
+  let note = notes.find((note) => note.id === id)
+  const body = req.body
+  
+  if (!body.content) {
+    return res.status(400).json({
+      error: 'content missing'
+    })
+  }
+
+  note = {...note, important:!note.important}
+
+  notes = notes.map(n => {
+    return n.id !== id ? n : note 
+  })
+  
+  res.json(note)
+})
+
 // Delete note
 app.delete('/api/notes/:id', (req, res) => {
   const id = Number(req.params.id)
