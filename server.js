@@ -16,7 +16,7 @@ const requestLogger = (req, res, next) => {
 
 // use middleware to parse req.body as JSON (before it gets to the routes)
 app.use(express.json())
-
+app.use(express.static('build'))
 app.use(requestLogger)
 
 // Hard coded list of notes
