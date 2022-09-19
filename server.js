@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const Note = require('./models/note')
 
 // allow requests from all origins
 app.use(cors())
@@ -48,7 +50,7 @@ app.get('/', (req, res) => {
 
 // Notes route
 app.get('/api/notes', (req, res) => {
-  res.json(notes)
+  Note.find({}).then((notes) => res.json(notes))
 })
 
 // Get note by id
