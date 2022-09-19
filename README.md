@@ -1,6 +1,8 @@
-# Simple Notes Api
+# Simple Notes App
 
-A simple notes API
+A simple notes App. 
+
+Click [here](https://summer-glade-9630.fly.dev/) for a demo
 
 ## Development
 
