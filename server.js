@@ -17,8 +17,8 @@ const requestLogger = (req, res, next) => {
 }
 
 // use middleware to parse req.body as JSON (before it gets to the routes)
-app.use(express.json())
 app.use(express.static('build'))
+app.use(express.json())
 app.use(requestLogger)
 
 // Hard coded list of notes
@@ -54,16 +54,17 @@ app.get('/api/notes', (req, res) => {
 })
 
 // Get note by id
-app.get('/api/notes/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const note = notes.find((note) => note.id == id)
-
-  if (note) {
-    res.json(note)
-  } else {
-    res.status(404).end()
-  }
-  
+app.get('/api/notes/:id', (req, res, next) => {
+  const id = req.params.id
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        res.json(note)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 // Generate note Id
@@ -82,21 +83,18 @@ app.post('/api/notes', (req, res) => {
     })
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
     important: body.important || false,
     date: new Date(),
-    id: generateId()
-  }
+  })
 
-  notes = notes.concat(note)
-  
-  res.json(note)
+  note.save().then(savedNote => res.json(savedNote))
 })
 
 // Update note
 app.put('/api/notes/:id', (req, res) => {
-  const id = Number(req.params.id)
+  const id = req.params.id
   let note = notes.find((note) => note.id === id)
   const body = req.body
   
@@ -129,7 +127,19 @@ const unknownEndpoint = (req, res, next) => {
 
 app.use(unknownEndpoint)
 
-const PORT = 8000
-app.listen(process.env.PORT || PORT, () => {
+const errorHandler = (error, req, res, net) => {
+  console.error(error)
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  net(error)
+}
+
+app.use(errorHandler)
+
+const PORT = process.env.PORT || 8000
+app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`)
 })
