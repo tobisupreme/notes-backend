@@ -113,11 +113,16 @@ app.put('/api/notes/:id', (req, res) => {
   res.json(note)
 })
 
-// Delete note
+/* 
+ * Delete note by id
+ */
 app.delete('/api/notes/:id', (req, res) => {
-  const id = Number(req.params.id)
-  notes = notes.filter((note) => note.id !== id)
-  res.status(204).end()
+  const id = req.params.id
+  Note.findByIdAndRemove(id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(err => next(err))
 })
 
 const unknownEndpoint = (req, res, next) => {
