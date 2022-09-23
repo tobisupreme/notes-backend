@@ -92,27 +92,27 @@ app.post('/api/notes', (req, res) => {
   note.save().then(savedNote => res.json(savedNote))
 })
 
-// Update note
+/* 
+ * Update note 
+ */
 app.put('/api/notes/:id', (req, res) => {
   const id = req.params.id
-  let note = notes.find((note) => note.id === id)
   const body = req.body
-  
-  if (!body.content) {
-    return res.status(400).json({
-      error: 'content missing'
-    })
+
+  const note = {
+    content: body.content,
+    important: body.important,
   }
 
-  note = {...note, important:!note.important}
-
-  notes = notes.map(n => {
-    return n.id !== id ? n : note 
-  })
-  
-  res.json(note)
+  Note.findByIdAndUpdate(id, note, {new: true})
+    .then((updatedNote) => {
+      res.json(updatedNote)
+    })
+    .catch(err => {
+      next(err)
+    })
 })
-
+  
 /* 
  * Delete note by id
  */
