@@ -9,7 +9,8 @@
     "build:ui": "rm -rf build && cd ../part2/ && npm run build && cp -r build ../notes_backend",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "lint": "eslint ."
   },
   "keywords": [
     "express",
@@ -18,6 +19,7 @@
   "author": "tobisupreme",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^8.24.0",
     "nodemon": "^2.0.19"
   },
   "dependencies": {

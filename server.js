@@ -21,28 +21,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(requestLogger)
 
-// Hard coded list of notes
-let notes = [
-  {
-    id: 1,
-    content: 'HTML is easy',
-    date: '2022-06-09T19:08:321Z',
-    important: true,
-  },
-  {
-    id: 2,
-    content: 'Browser can execute only JavaScript',
-    date: '2022-06-09T19:09:321Z',
-    important: false,
-  },
-  {
-    id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    date: '2022-06-09T19:10:321Z',
-    important: true,
-  },
-]
-
 // Home route
 app.get('/', (req, res) => {
   res.send('<h1>Hey!</h1>')
@@ -64,14 +42,8 @@ app.get('/api/notes/:id', (req, res, next) => {
         res.status(404).end()
       }
     })
-    .catch(error => next(error))
+    .catch((error) => next(error))
 })
-
-// Generate note Id
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max.apply(null, notes.map((n) => n.id)) : 0
-  return maxId + 1
-}
 
 // Create note
 app.post('/api/notes', async (req, res, next) => {
@@ -95,8 +67,8 @@ app.post('/api/notes', async (req, res, next) => {
     .catch((error) => next(error))
 })
 
-/* 
- * Update note 
+/*
+ * Update note
  */
 app.put('/api/notes/:id', async (req, res, next) => {
   const id = req.params.id
@@ -115,21 +87,21 @@ app.put('/api/notes/:id', async (req, res, next) => {
       next(err)
     })
 })
-  
-/* 
+
+/*
  * Delete note by id
  */
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res, next) => {
   const id = req.params.id
   Note.findByIdAndRemove(id)
-    .then(result => {
+    .then(() => {
       res.status(204).end()
     })
-    .catch(err => next(err))
+    .catch((err) => next(err))
 })
 
 const unknownEndpoint = (req, res, next) => {
-  res.status(404).send({error: 'unknown endpoint'})
+  res.status(404).send({ error: 'unknown endpoint' })
   next()
 }
 
