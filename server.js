@@ -74,12 +74,12 @@ const generateId = () => {
 }
 
 // Create note
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', async (req, res, next) => {
   const body = req.body
-  
+
   if (!body.content) {
     return res.status(400).json({
-      error: 'content missing'
+      error: 'content missing',
     })
   }
 
@@ -89,13 +89,16 @@ app.post('/api/notes', (req, res) => {
     date: new Date(),
   })
 
-  note.save().then(savedNote => res.json(savedNote))
+  note
+    .save()
+    .then((savedNote) => res.json(savedNote))
+    .catch((error) => next(error))
 })
 
 /* 
  * Update note 
  */
-app.put('/api/notes/:id', (req, res) => {
+app.put('/api/notes/:id', async (req, res, next) => {
   const id = req.params.id
   const body = req.body
 
@@ -104,11 +107,11 @@ app.put('/api/notes/:id', (req, res) => {
     important: body.important,
   }
 
-  Note.findByIdAndUpdate(id, note, {new: true})
+  Note.findByIdAndUpdate(id, note, { new: true, runValidators: true, context: 'query' })
     .then((updatedNote) => {
       res.json(updatedNote)
     })
-    .catch(err => {
+    .catch((err) => {
       next(err)
     })
 })
@@ -132,14 +135,16 @@ const unknownEndpoint = (req, res, next) => {
 
 app.use(unknownEndpoint)
 
-const errorHandler = (error, req, res, net) => {
+const errorHandler = (error, req, res, next) => {
   console.error(error)
 
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message })
   }
 
-  net(error)
+  next(error)
 }
 
 app.use(errorHandler)
