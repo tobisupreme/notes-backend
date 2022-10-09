@@ -5,6 +5,13 @@ const User = require('../models/user')
 usersRouter.post('/', async (req, res) => {
   const { username, password, name } = req.body
 
+  const existingUser = await User.findOne({ username })
+  if (existingUser) {
+    return res.status(400).json({
+      error: 'username must be unique'
+    })
+  }
+
   const passwordHash = await bcrypt.hash(password, 10)
 
   const user = new User({
