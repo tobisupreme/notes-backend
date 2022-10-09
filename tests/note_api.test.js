@@ -3,6 +3,8 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 const Note = require('../models/note')
 
@@ -111,6 +113,40 @@ describe('deletion of a note', () => {
     const contents = notesAtEnd.map((r) => r.content)
 
     expect(contents).not.toContain(noteToDelete.content)
+  })
+})
+
+
+describe('when there is initially one user in db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('secret', 10)
+    const user = new User({ username: 'admin', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'tobisupreme',
+      name: 'Tobi Supreme',
+      password: 'supremetobi'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtStart.length).toBe(usersAtEnd.length - 1)
+
+    const usernames = usersAtEnd.map(user => user.username)
+    expect(usernames).toContain(newUser.username)
   })
 })
 
